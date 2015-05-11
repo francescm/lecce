@@ -1,0 +1,255 @@
+% $Header: /cvsroot/latex-beamer/latex-beamer/solutions/generic-talks/generic-ornate-15min-45min.en.tex,v 1.4 2004/10/07 20:53:08 tantau Exp $
+
+\documentclass{beamer}
+\usepackage{hyperref}
+% This file is a solution template for:
+
+% - Giving a talk on some subject.
+% - The talk is between 15min and 45min long.
+% - Style is ornate.
+
+
+
+% Copyright 2004 by Till Tantau <tantau@users.sourceforge.net>.
+%
+% In principle, this file can be redistributed and/or modified under
+% the terms of the GNU Public License, version 2.
+%
+% However, this file is supposed to be a template to be modified
+% for your own needs. For this reason, if you use this file as a
+% template and not specifically distribute it as part of a another
+% package/program, I grant the extra permission to freely copy and
+% modify this file as you see fit and even to delete this copyright
+% notice. 
+
+
+
+\mode<presentation>
+{
+  \usetheme{Warsaw}
+  % or ...
+
+  \setbeamercovered{transparent}
+  % or whatever (possibly just delete it)
+
+  \setbeamertemplate{headline}{}
+}
+
+
+
+\usepackage[english]{babel}
+% or whatever
+
+\usepackage[latin1]{inputenc}
+% or whatever
+
+\usepackage{times}
+\usepackage[T1]{fontenc}
+% Or whatever. Note that the encoding and the font should match. If T1
+% does not look nice, try deleting the line with the fontenc.
+
+
+\title % (optional, use only with long paper titles)
+{Autenticazione SAML su Office365}
+
+%\subtitle
+%{Presentation Subtitle} % (optional)
+
+\author % (optional, use only with lots of authors)
+{Francesco Malvezzi}
+% - Use the \inst{?} command only if the authors have different
+%   affiliation.
+
+\institute[Università di Modena e Reggio nell'Emilia] % (optional, but mostly needed)
+{
+Università di Modena e Reggio nell'Emilia
+}
+
+%  \and
+%  \inst{2}%
+%  Department of Theoretical Philosophy\\
+%  University of Elsewhere}
+% - Use the \inst command only if there are several affiliations.
+% - Keep it simple, no one is interested in your street address.
+
+\date % (optional)
+{14 maggio 2015}
+
+%\subject{Talks}
+% This is only inserted into the PDF information catalog. Can be left
+% out. 
+
+
+
+% If you have a file called "university-logo-filename.xxx", where xxx
+% is a graphic format that can be processed by latex or pdflatex,
+% resp., then you can add a logo as follows:
+
+% \pgfdeclareimage[height=0.5cm]{university-logo}{university-logo-filename}
+% \logo{\pgfuseimage{university-logo}}
+
+
+
+% Delete this, if you do not want the table of contents to pop up at
+% the beginning of each subsection:
+%\AtBeginSubsection[]
+%{
+%  \begin{frame}<beamer>
+%    \frametitle{Outline}
+%    \tableofcontents[currentsection,currentsubsection]
+%  \end{frame}
+%}
+
+
+% If you wish to uncover everything in a step-wise fashion, uncomment
+% the following command: 
+
+%\beamerdefaultoverlayspecification{<+->}
+
+
+\begin{document}
+
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+%\begin{frame}
+%  \frametitle{Outline}
+%  \tableofcontents
+  % You might wish to add the option [pausesections]
+%\end{frame}
+
+
+% Since this a solution template for a generic talk, very little can
+% be said about how it should be structured. However, the talk length
+% of between 15min and 45min and the theme suggest that you stick to
+% the following rules:  
+
+% - Exactly two or three sections (other than the summary).
+% - At *most* three subsections per section.
+% - Talk about 30s to 2min per frame. So there should be between about
+%   15 and 30 frames, all told.
+
+\section{Cos'è Office365}
+
+
+\begin{frame}[fragile]
+  \frametitle{Office365}
+\begin{itemize}
+\item Cloud di Microsoft;
+
+\item rende disponibili vari servizi (mail, spazio disco, strumenti di office automation via cloud);
+
+\item gli utenti sono in un ``active directory'' cloud che si chiama ``Azure'';
+\item ha alcune funzionalità SAML2.
+\end{itemize}
+\pause{}
+Questo scalfisce solo la superficie.
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Obiettivo}
+
+Permettere agli utenti dell'organizzazione di accedere a Office365 con le proprie credenziali:
+
+\url{https://portal.microsoftonline.com}
+
+\end{frame}
+
+\section{Setup Office365}
+
+\begin{frame}[fragile]
+  \frametitle{Dimostrare la proprità del dominio DNS}
+\begin{itemize}
+\item Registrare un dominio di fantasia nella gerarchia \verb+microsoftonline.com+, ad esempio: \verb+idem2015.microsoftonline.com+.
+
+\item Associare il vostro nome dominio: Microsoft vi porrà una sfida: un record TXT da aggiungere al vostro DNS.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Creare un utente sul cloud}
+Anche se l'autenticazione sarà effettuata dal sistema Single Sign On locale \footnote{Microsoft ama il termine ``on premise''}, gli utenti devono esistere sul cloud, ad esempio con
+\begin{itemize}
+\item il tool \href{http://www.microsoft.com/en-us/server-cloud/products/forefront-identity-manager/}{Forefront Identity Manager};
+\item o con chiamate powershell (ad es. \verb+New-MsolUser+).
+\end{itemize}
+
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Preparare Office365 alla federazione}
+
+Per istruire Office365 che deve fare parte di una federazione esiste un comando powershell preciso: \verb+Set-MsolDomainAuthentication+.
+
+I suoi parametri sono:
+\begin{itemize}
+\item nome,
+\item entityId,
+\item url del servizio SAML2 POST SSO;
+\item url di logout,
+\item chiave pubblica (formato pem);
+\end{itemize}
+cioè in pratica i metadati.
+\end{frame}
+
+\section{Shibboleth-IdP}
+\begin{frame}[fragile]
+  \frametitle{Configurazioni di Shibboleth-IdP}
+
+A questo punto lo Shibboleth-IdP deve essere pronto a dialogare con Office365:
+\begin{itemize}
+\item aggiungere una sezione apposta al \verb+relying-party.xml+;
+\item scaricare i metadati da \url{https://nexus.microsoftonline-p.com/federationmetadata/saml20/federationmetadata.xml}.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]
+Nel relying-party.xml:
+\small{
+\begin{verbatim}
+<bean parent="RelyingPartyByName" \
+  c:relyingPartyIds="urn:federation:MicrosoftOnline">
+  <property name="profileConfigurations">
+    <list>
+      <bean parent="SAML2.SSO" \
+p:encryptAssertions="false" 
+p:nameIDFormatPrecedence=\
+"urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified" 
+p:signAssertions="conditional"
+p:encryptNameIDs="never" />
+    </list>
+  </property>
+</bean>
+\end{verbatim}
+}
+\end{frame}
+
+\subsection{Rilascio degli atributi}
+\begin{frame}[fragile]
+  \frametitle{Rilascio degli attributi}
+
+Office365 si aspetta che Shibboleth rilasci:
+\begin{itemize}
+\item \verb+immutableID+: in AD è il guid utente encoded base64, ma è sufficiente che sia un attributo unico (come lo uid) nel formato nameid; 
+\item \verb+UserId+: equivalente allo \verb+eppn+. Personalmente l'ho ricostruito con uno scriptedAttributeDefinition per evitare di usare \verb+eppn+ che è un attributo scoped.
+\end{itemize}
+ 
+\end{frame}
+
+\section{Grazie}
+\begin{frame}[fragile]
+  \frametitle{Grazie}
+
+Grazie per l'attenzione e la pazienza.
+ 
+\end{frame}
+
+
+\end{document}
+
+
